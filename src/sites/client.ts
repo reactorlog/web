@@ -23,15 +23,6 @@ async function readJson(response: Response): Promise<unknown> {
   }
 }
 
-export async function fetchHealth(): Promise<boolean> {
-  try {
-    const response = await fetch('/api/health')
-    return response.ok
-  } catch {
-    return false
-  }
-}
-
 export async function fetchSites(): Promise<Site[]> {
   let response: Response
   try {
