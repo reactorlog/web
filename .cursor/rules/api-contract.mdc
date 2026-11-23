@@ -1,0 +1,21 @@
+---
+description: Keep web client types aligned with reactorlog/api
+alwaysApply: true
+---
+
+# API contract lives in reactorlog/api
+
+This repo is the SPA only. HTTP JSON shapes, routes, and DB schema are owned by
+the sibling repo at `../api` (`github.com/reactorlog/api`).
+
+Before changing fetch clients, parsers, stores, or pages under `src/sites/` or
+`src/reactors/`:
+
+1. Read `../api/internal/api/types.go` for JSON fields.
+2. Read `../api/internal/api/handler.go` for routes and status codes.
+3. If the change depends on persistence, skim `../api/migrations/sql/` and
+   `../api/internal/api/store.go`.
+
+Mirror the API in TypeScript. Parse `unknown` at the HTTP boundary. Do not add
+OpenAPI, a shared package, or a second schema source unless the user asks.
+Update colocated Vitest coverage when shapes or error mapping change.
