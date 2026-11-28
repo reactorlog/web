@@ -84,8 +84,12 @@
               <span class="flex min-w-0 flex-col gap-0.5">
                 <span class="flex min-w-0 items-baseline gap-1.5">
                   <span class="truncate font-medium">{site.name}</span>
-                  <span class="shrink-0 text-slate-500 tabular-nums group-hover:text-slate-400">
-                    {site.reactor_count}<span class="sr-only">{site.reactor_count === 1 ? ' reactor' : ' reactors'}</span>
+                  <span
+                    class="shrink-0 font-mono text-sm text-slate-500 tabular-nums group-hover:text-slate-400"
+                  >
+                    <span aria-hidden="true">· </span>{site.reactor_count}<span class="sr-only"
+                      >{site.reactor_count === 1 ? ' reactor' : ' reactors'}</span
+                    >
                   </span>
                 </span>
                 {#if place}
