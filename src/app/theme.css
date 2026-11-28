@@ -3,9 +3,9 @@
 @theme {
   --color-cherenkov: #00a8e8;
   --color-amber: #e6a817;
-  --color-page: #020617;
-  --color-panel: #0f172a;
-  --color-line: #1e293b;
+  --color-page: #0a0a0a;
+  --color-panel: #141414;
+  --color-line: #2a2a2a;
   --font-sans: 'IBM Plex Sans', 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }
@@ -19,7 +19,7 @@ body {
   margin: 0;
   min-height: 100%;
   background: var(--color-page);
-  color: #e2e8f0;
+  color: #e4e4e7;
   font-family: var(--font-sans);
 }
 
