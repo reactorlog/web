@@ -19,6 +19,7 @@ const site = {
   email: null,
   created_at: '2026-11-17T00:00:00Z',
   updated_at: '2026-11-17T00:00:00Z',
+  reactor_count: 0,
 }
 
 describe('sites store', () => {

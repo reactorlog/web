@@ -15,6 +15,7 @@ export type Site = {
   email: string | null
   created_at: string
   updated_at: string
+  reactor_count: number
 }
 
 export type SiteDetail = Site & { reactors: import('../reactors/types').Reactor[] }

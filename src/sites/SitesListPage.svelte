@@ -33,6 +33,13 @@
   function locationLabel(site: Site): string {
     return [site.city, site.state].filter(Boolean).join(' · ')
   }
+
+  function reactorLabel(count: number): string {
+    if (count === 1) {
+      return '1 reactor'
+    }
+    return `${count} reactors`
+  }
 </script>
 
 {#if screen.kind === 'loading'}
@@ -73,6 +80,7 @@
         class="m-0 list-none divide-y divide-line border border-line bg-panel p-0 md:grid md:grid-cols-2 md:gap-3 md:divide-y-0 md:border-0 md:bg-transparent lg:grid-cols-3"
       >
         {#each model.visible as site (site.id)}
+          {@const place = locationLabel(site)}
           <li class="md:border md:border-line md:bg-panel">
             <a
               href={`/sites/${encodeURIComponent(site.id)}`}
@@ -83,7 +91,12 @@
                 <SiteIcon class="size-4 shrink-0 text-cherenkov md:mt-0.5" />
                 <span class="truncate font-medium">{site.name}</span>
               </span>
-              <span class="shrink-0 text-xs text-slate-500 md:pl-7">{locationLabel(site)}</span>
+              <span class="shrink-0 text-xs text-slate-500 md:pl-7">
+                {#if place}
+                  <span class="block">{place}</span>
+                {/if}
+                <span class="block">{reactorLabel(site.reactor_count)}</span>
+              </span>
             </a>
           </li>
         {/each}

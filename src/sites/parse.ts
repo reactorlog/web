@@ -22,6 +22,13 @@ function readNullableString(value: unknown, field: string): string | null {
   return value
 }
 
+function readNonNegativeInteger(value: unknown, field: string): number {
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < 0) {
+    throw new Error(`expected non-negative integer for ${field}`)
+  }
+  return value
+}
+
 function readNullableNumber(value: unknown, field: string): number | null {
   if (value === null) {
     return null
@@ -53,6 +60,7 @@ export function parseSite(value: unknown): Site {
     email: readNullableString(value.email, 'email'),
     created_at: readString(value.created_at, 'created_at'),
     updated_at: readString(value.updated_at, 'updated_at'),
+    reactor_count: readNonNegativeInteger(value.reactor_count, 'reactor_count'),
   }
 }
 
