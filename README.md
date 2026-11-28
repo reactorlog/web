@@ -5,32 +5,33 @@ TypeScript SPA for browsing reactorlog sites and reactors. Talks to the sibling
 
 ## Run locally
 
-Requires Node matching an LTS that can install the pinned Vite stack, and a
-running API on `HTTP_ADDR` (default `:8080`).
-
-```sh
-cd ../api
-docker compose up -d
-make migrate
-make ingest-nrc
-make run
-```
-
-In this repo:
+Requires Node (Vite stack), Go matching `../api/go.mod`, Docker Compose, and a
+sibling checkout of `reactorlog/api` at `../api` with a root `.env`.
 
 ```sh
 npm install
 npm run dev
 ```
 
-Vite serves the app and proxies `/api/*` to `http://127.0.0.1:8080` with the
-`/api` prefix stripped, so the browser stays same-origin.
+`npm run dev` starts postgres (via `../api` compose) if needed, migrates, starts
+the API on `:8080` when it is not already healthy, then runs Vite on
+`http://127.0.0.1:5173`. Vite proxies `/api/*` to that API with the `/api`
+prefix stripped.
+
+Use `npm run dev:web` only when you already manage the API yourself.
+
+Optional data load (NRC must be reachable):
+
+```sh
+cd ../api && make ingest-nrc
+```
 
 ## Scripts
 
 | Script | Purpose |
 | --- | --- |
-| `npm run dev` | Vite dev server with API proxy |
+| `npm run dev` | Sibling API (if needed) + Vite with proxy |
+| `npm run dev:web` | Vite only |
 | `npm run build` | Production bundle in `dist/` |
 | `npm run preview` | Serve `dist/` |
 | `npm test` | Vitest (parse + store) |
@@ -44,3 +45,4 @@ Vite serves the app and proxies `/api/*` to `http://127.0.0.1:8080` with the
 | `src/base` | PageShell, list chrome, ChartSlot |
 | `src/sites` | Types, HTTP client, store, pages |
 | `src/reactors` | Reactor types and list presentation |
+| `scripts/dev.sh` | Local stack: api + vite |

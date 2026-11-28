@@ -1,7 +1,10 @@
 <script lang="ts">
   import ChartSlot from '../base/ChartSlot.svelte'
+  import EmptyState from '../base/EmptyState.svelte'
+  import SiteIcon from '../base/icons/SiteIcon.svelte'
   import { navigate } from '../app/router'
   import ReactorList from '../reactors/ReactorList.svelte'
+  import { siteDetailScreen } from './screen'
   import { loadSite, siteDetailState } from './store'
 
   type Props = {
@@ -13,34 +16,30 @@
   $effect(() => {
     void loadSite(id)
   })
+
+  const screen = $derived(siteDetailScreen($siteDetailState))
 </script>
 
-{#if $siteDetailState.status === 'loading' || $siteDetailState.status === 'idle'}
+{#if screen.kind === 'loading'}
   <p class="text-sm text-slate-500">Loading site…</p>
-{:else if $siteDetailState.status === 'error'}
-  <div class="space-y-3">
-    <p class="text-sm text-amber">{$siteDetailState.message}</p>
-    {#if $siteDetailState.message === 'site not found'}
-      <a
-        href="/"
-        class="text-sm"
-        onclick={(event) => {
-          event.preventDefault()
-          navigate('/')
-        }}>Back to sites</a
-      >
-    {:else}
-      <button
-        type="button"
-        class="border border-line bg-panel px-3 py-1.5 text-sm text-cherenkov hover:border-cherenkov"
-        onclick={() => void loadSite(id)}
-      >
-        Retry
-      </button>
-    {/if}
+{:else if screen.kind === 'empty'}
+  <div class="space-y-4">
+    <EmptyState message={screen.message}>
+      {#snippet icon()}
+        <SiteIcon class="size-10 text-slate-600" />
+      {/snippet}
+    </EmptyState>
+    <a
+      href="/"
+      class="inline-block text-sm"
+      onclick={(event) => {
+        event.preventDefault()
+        navigate('/')
+      }}>Back to sites</a
+    >
   </div>
 {:else}
-  {@const site = $siteDetailState.data}
+  {@const site = screen.site}
   <div class="space-y-6">
     <div>
       <a
@@ -51,10 +50,15 @@
           navigate('/')
         }}>Sites</a
       >
-      <h2 class="mt-1 text-2xl font-semibold tracking-tight text-slate-100">{site.name}</h2>
-      <p class="mt-1 text-sm text-slate-400">
-        {[site.location, site.state].filter(Boolean).join(' · ') || 'Location unknown'}
-      </p>
+      <div class="mt-2 flex items-start gap-3">
+        <SiteIcon class="mt-1 size-6 shrink-0 text-cherenkov" />
+        <div class="min-w-0">
+          <h2 class="text-2xl font-semibold tracking-tight text-slate-100">{site.name}</h2>
+          <p class="mt-1 text-sm text-slate-400">
+            {[site.location, site.state].filter(Boolean).join(' · ') || 'Location unknown'}
+          </p>
+        </div>
+      </div>
     </div>
 
     <ReactorList reactors={site.reactors} />
