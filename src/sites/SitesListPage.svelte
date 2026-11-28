@@ -33,13 +33,6 @@
   function locationLabel(site: Site): string {
     return [site.city, site.state].filter(Boolean).join(' · ')
   }
-
-  function reactorLabel(count: number): string {
-    if (count === 1) {
-      return '1 reactor'
-    }
-    return `${count} reactors`
-  }
 </script>
 
 {#if screen.kind === 'loading'}
@@ -84,18 +77,20 @@
           <li class="md:border md:border-line md:bg-panel">
             <a
               href={`/sites/${encodeURIComponent(site.id)}`}
-              class="flex items-center justify-between gap-3 px-4 py-3 text-zinc-100 no-underline hover:bg-white/5 md:block md:min-h-18"
+              class="group flex items-start gap-3 px-4 py-3 text-zinc-100! no-underline hover:bg-white/5 hover:text-zinc-50! hover:no-underline!"
               onclick={(event) => openSite(site.id, event)}
             >
-              <span class="flex min-w-0 items-center gap-3 md:mb-1 md:items-start">
-                <SiteIcon class="size-4 shrink-0 text-cherenkov md:mt-0.5" />
-                <span class="truncate font-medium">{site.name}</span>
-              </span>
-              <span class="shrink-0 text-xs text-slate-500 md:pl-7">
+              <SiteIcon class="mt-1 size-4 shrink-0 text-cherenkov" />
+              <span class="flex min-w-0 flex-col gap-0.5">
+                <span class="flex min-w-0 items-baseline gap-1.5">
+                  <span class="truncate font-medium">{site.name}</span>
+                  <span class="shrink-0 text-slate-500 tabular-nums group-hover:text-slate-400">
+                    {site.reactor_count}<span class="sr-only">{site.reactor_count === 1 ? ' reactor' : ' reactors'}</span>
+                  </span>
+                </span>
                 {#if place}
-                  <span class="block">{place}</span>
+                  <span class="truncate text-xs text-slate-500">{place}</span>
                 {/if}
-                <span class="block">{reactorLabel(site.reactor_count)}</span>
               </span>
             </a>
           </li>
