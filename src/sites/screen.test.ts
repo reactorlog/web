@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   SITE_MISSING_MESSAGE,
   SITES_EMPTY_MESSAGE,
+  buildSitesListModel,
   siteDetailScreen,
   sitesScreen,
 } from './screen'
@@ -26,6 +27,10 @@ const site: Site = {
   updated_at: '2026-11-17T00:00:00Z',
 }
 
+function plant(overrides: Partial<Site> & Pick<Site, 'id' | 'name'>): Site {
+  return { ...site, city: null, state: null, location: null, ...overrides }
+}
+
 describe('sitesScreen', () => {
   it('maps ready empty list to the sites empty message', () => {
     expect(sitesScreen({ status: 'ready', data: [] })).toEqual({
@@ -41,11 +46,71 @@ describe('sitesScreen', () => {
     })
   })
 
-  it('maps a populated list', () => {
-    expect(sitesScreen({ status: 'ready', data: [site] })).toEqual({
+  it('maps ready sites to a flat name-sorted list', () => {
+    const dixon = plant({ id: 'site-dixon', name: 'Dixon', state: 'IL' })
+    const braidwood = plant({ id: 'site-braidwood', name: 'Braidwood', state: 'IL' })
+    const southTexas = plant({ id: 'site-south-texas', name: 'South Texas', state: 'TX' })
+
+    expect(
+      sitesScreen({
+        status: 'ready',
+        data: [dixon, southTexas, braidwood],
+      }),
+    ).toEqual({
       kind: 'list',
-      sites: [site],
+      sites: [braidwood, dixon, southTexas],
     })
+  })
+})
+
+describe('buildSitesListModel', () => {
+  const braidwood = plant({ id: 'site-braidwood', name: 'Braidwood', state: 'IL', city: 'Braceville' })
+  const dixon = plant({ id: 'site-dixon', name: 'Dixon', state: 'IL' })
+  const paloVerde = plant({ id: 'site-palo-verde', name: 'Palo Verde', state: 'AZ' })
+  const unplaced = plant({ id: 'site-unplaced', name: 'Unplaced', state: null })
+
+  const fleet = [dixon, paloVerde, braidwood, unplaced]
+
+  it('builds facet states from the full fleet, ignoring null state', () => {
+    const model = buildSitesListModel(fleet, { query: '', stateFilter: 'all' })
+    expect(model.facetStates).toEqual(['AZ', 'IL'])
+    expect(model.visible.map((s) => s.name)).toEqual([
+      'Braidwood',
+      'Dixon',
+      'Palo Verde',
+      'Unplaced',
+    ])
+    expect(model.noMatches).toBe(false)
+  })
+
+  it('filters by query across name, city, and state', () => {
+    expect(
+      buildSitesListModel(fleet, { query: 'brace', stateFilter: 'all' }).visible.map((s) => s.name),
+    ).toEqual(['Braidwood'])
+    expect(
+      buildSitesListModel(fleet, { query: 'az', stateFilter: 'all' }).visible.map((s) => s.name),
+    ).toEqual(['Palo Verde'])
+  })
+
+  it('applies state filter after query and keeps facet options from the full fleet', () => {
+    const model = buildSitesListModel(fleet, { query: 'dixon', stateFilter: 'IL' })
+    expect(model.visible.map((s) => s.name)).toEqual(['Dixon'])
+    expect(model.facetStates).toEqual(['AZ', 'IL'])
+  })
+
+  it('excludes null-state sites when a concrete state is selected', () => {
+    const model = buildSitesListModel(fleet, { query: '', stateFilter: 'IL' })
+    expect(model.visible.map((s) => s.name)).toEqual(['Braidwood', 'Dixon'])
+  })
+
+  it('marks noMatches when the fleet is nonempty but filters hide everything', () => {
+    const model = buildSitesListModel(fleet, { query: 'zzzz', stateFilter: 'all' })
+    expect(model.visible).toEqual([])
+    expect(model.noMatches).toBe(true)
+  })
+
+  it('does not mark noMatches for an empty fleet', () => {
+    expect(buildSitesListModel([], { query: '', stateFilter: 'all' }).noMatches).toBe(false)
   })
 })
 
