@@ -73,17 +73,29 @@
         class="m-0 list-none divide-y divide-line border border-line bg-panel p-0 md:grid md:grid-cols-2 md:gap-3 md:divide-y-0 md:border-0 md:bg-transparent lg:grid-cols-3"
       >
         {#each model.visible as site (site.id)}
+          {@const place = locationLabel(site)}
           <li class="md:border md:border-line md:bg-panel">
             <a
               href={`/sites/${encodeURIComponent(site.id)}`}
-              class="flex items-center justify-between gap-3 px-4 py-3 text-zinc-100 no-underline hover:bg-white/5 md:block md:min-h-18"
+              class="group flex items-start gap-3 px-4 py-3 text-zinc-100! no-underline hover:bg-white/5 hover:text-zinc-50! hover:no-underline!"
               onclick={(event) => openSite(site.id, event)}
             >
-              <span class="flex min-w-0 items-center gap-3 md:mb-1 md:items-start">
-                <SiteIcon class="size-4 shrink-0 text-cherenkov md:mt-0.5" />
-                <span class="truncate font-medium">{site.name}</span>
+              <SiteIcon class="mt-1 size-4 shrink-0 text-cherenkov" />
+              <span class="flex min-w-0 flex-col gap-0.5">
+                <span class="flex min-w-0 items-baseline gap-1.5">
+                  <span class="truncate font-medium">{site.name}</span>
+                  <span
+                    class="shrink-0 font-mono text-sm text-slate-500 tabular-nums group-hover:text-slate-400"
+                  >
+                    <span aria-hidden="true">· </span>{site.reactor_count}<span class="sr-only"
+                      >{site.reactor_count === 1 ? ' reactor' : ' reactors'}</span
+                    >
+                  </span>
+                </span>
+                {#if place}
+                  <span class="truncate text-xs text-slate-500">{place}</span>
+                {/if}
               </span>
-              <span class="shrink-0 text-xs text-slate-500 md:pl-7">{locationLabel(site)}</span>
             </a>
           </li>
         {/each}

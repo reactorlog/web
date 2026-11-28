@@ -18,6 +18,7 @@ const siteJson = {
   email: null,
   created_at: '2026-11-17T00:00:00Z',
   updated_at: '2026-11-17T00:00:00Z',
+  reactor_count: 2,
 }
 
 const reactorJson = {
@@ -63,5 +64,25 @@ describe('parseSiteDetail', () => {
 describe('parseSite', () => {
   it('rejects a bad field type', () => {
     expect(() => parseSite({ ...siteJson, name: 1 })).toThrow(/name/)
+  })
+
+  it('accepts a zero reactor_count', () => {
+    expect(parseSite({ ...siteJson, reactor_count: 0 }).reactor_count).toBe(0)
+  })
+
+  it('rejects a missing reactor_count', () => {
+    const { reactor_count, ...rest } = siteJson
+    expect(reactor_count).toBe(2)
+    expect(() => parseSite(rest)).toThrow(/reactor_count/)
+  })
+
+  it('rejects a non-integer reactor_count', () => {
+    expect(() => parseSite({ ...siteJson, reactor_count: 1.5 })).toThrow(/reactor_count/)
+    expect(() => parseSite({ ...siteJson, reactor_count: '2' })).toThrow(/reactor_count/)
+    expect(() => parseSite({ ...siteJson, reactor_count: null })).toThrow(/reactor_count/)
+  })
+
+  it('rejects a negative reactor_count', () => {
+    expect(() => parseSite({ ...siteJson, reactor_count: -1 })).toThrow(/reactor_count/)
   })
 })
